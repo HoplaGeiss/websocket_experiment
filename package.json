@@ -1,0 +1,21 @@
+{
+  "name": "WebSocket",
+  "description": "WebSocket - Master thesis experiments",
+  "version": "1.0.0",
+  "homepage": "https://github.com/HoplaGeiss/WebSocket",
+  "contributors": [
+    {
+      "name": "Gabriel Muller",
+      "email": "gabriel.muller.12@gmail.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/HoplaGeiss/WebSocket"
+  },
+  "dependencies": {
+    "socketcluster-client": "~0.9.17",
+    "socketcluster": "~0.9.22"
+  },
+  "readmeFilename": "README.md"
+}
