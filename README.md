@@ -4,15 +4,36 @@ As part of my master thesis at Cranfield university I have been brought to make 
 
 ## Installation
 
+There is two kind of installation. One on a bar metal server or typically a virtual machine and one on the users's local machine.
+
+#### User local machine installation
 `wget 'https://raw.githubusercontent.com/HoplaGeiss/websocket_experiment/master/install.sh' -O - | sh`
 
-## Run experiment
+#### Virtual machine installation
+`wget 'https://raw.githubusercontent.com/HoplaGeiss/websocket_experiment/master/bare_server_install.sh' -O - | sh`
 
-`./plot.sh <nb_client_sec> <time_experiment>`
+## Experiment
 
-Running `plot.sh` runs a concurrent WebSocket connections experiment during `<time_experiment>`. Each seconds `<nb_client_sec>` WebSocket clients are created. Every second, each clients sends a random number to the server and the server answers back the same number. 
+### Concurrency experiment
 
-The scripts also plots the node processus processor usage in function of the time.
+Concurrency experiments evalutate the amount of concurrent connections a WebSocket server can handle.
+To simulate this, the client script spawns new clients every seconds, each clients are sending every second a ping message to the server and the server answers by a pong message.
+
+### Run the experiment
+
+To run the the experiment
+
+`cd experiment`
+`./experiment.sh <nb_client_sec> <time_experiment>`
+
+The experiment can be run on a server without graphical output.
+In this case, the user is asked his IP and user name to transfer the data on his computer and then plot the results from there.
+
+`./experiment.sh <nb_client_sec> <time_experiment>`
+`./plot.sh`
+
+`nb_client_sec` Number of clients beeing spawnd every seconds
+`time_experiment` Time of the experiment
 
 
 
