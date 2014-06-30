@@ -23,14 +23,18 @@ To simulate this, the client script spawns new clients every seconds, each clien
 
 To run the the experiment
 
-`cd experiment`
-`./experiment.sh <nb_client_sec> <time_experiment>`
+```
+cd experiment
+./experiment.sh <nb_client_sec> <time_experiment>
+```
 
 The experiment can be run on a server without graphical output.
 In this case, the user is asked his IP and user name to transfer the data on his computer and then plot the results from there.
 
-`./experiment.sh <nb_client_sec> <time_experiment>`
-`./plot.sh`
+```
+./experiment.sh <nb_client_sec> <time_experiment>
+./plot.sh
+```
 
 `nb_client_sec` Number of clients beeing spawnd every seconds
 `time_experiment` Time of the experiment
