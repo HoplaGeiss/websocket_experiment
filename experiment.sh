@@ -53,6 +53,10 @@ fi
 folder="results/experiment_$date"_"$time"
 mkdir "$folder"
 
+# Stores values in a file for later use
+echo $1 > $folder/conf.txt
+echo $2 >> $folder/conf.txt
+
 top -b -d 1 > "$folder"/top.txt & # Starts top and saves raw data in top.txt
 
 # Starts the clients and the servers scripts
