@@ -54,9 +54,13 @@ module.exports.run = function (worker) {
       activeSessions[socket.session.id] = socket.session; // Stores the id of the sockets
 
       // The server listens to the ping event from the clients
-      socket.on("ping", function (num) {
-        // console.log("Socket " + this.session.id + " reveived a ping: " + num);
-        socket.session.emit("pong","pong" + num);        
+      // socket.on("ping", function (num) {
+      //   // console.log("Socket " + this.session.id + " reveived a ping: " + num);
+      //   socket.session.emit("pong","pong" + num);        
+      // });
+
+      socket.on("ping", function () {
+        socket.session.emit("pong","pong");        
       });
 
 

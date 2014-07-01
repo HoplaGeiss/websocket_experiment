@@ -3,48 +3,10 @@ declare ids=''
 declare cmdLines=''
 declare fileNames=''
 
-# Verifies the scripts as the correct number of parameters
-if [ $# -ne 2 ]
-then 
-  echo "Verify usage: experiment.sh <nb_client_sec> <time_experiment>"
-  exit 1
-fi
-
-# Asks if the local runs the code in local or on a remote server
-echo "To plot the experiment, the script needs to be run on a server enabling graphical output"
-while true 
-do
-  read -p "Does your server enable it? [Y/N] " yn
-  case $yn in
-    [Yy]* ) 
-      remote_server=false
-      break;;
-    [Nn]* ) 
-      remote_server=true
-      break;;
-    * ) 
-      echo "Please answer yes or no.";;
-  esac
-done
-
-# Asks the user for it's local ip, so as to plot the graph from its computer
-if $remote_server 
-then
-  while true; do
-    read -p "Please type in your ip: " local_ip 
-    read -p "Please type your login: " local_login
-    if ssh -o connectTimeout=5 $local_login@$local_ip 'exit' 
-    then 
-      break
-    else 
-      echo "this IP can not be reached" 
-    fi
-  done
-fi
-
 # Creates a new folder for each experiments
 date=$(date +%Y-%m-%d)
-if $remote_server 
+# If we are on the remote machine the print $4
+if [ "$3" -ge 1 ] 
 then
   time=$(date | awk '{print $4}')
 else
@@ -93,7 +55,13 @@ do
   
   # Write measurements in files 
   echo $cmdLine > "$folder"/"$cmdLine":"$id".txt # writes the name of the command line used, so as to use it as label in gnuplot
-  grep $id "$folder"/node.txt |cut -c 49-52 | nl >> "$folder"/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
+
+  if [ $3 -ge 1 ] # If we are on a remote machine
+  then
+    grep $id "$folder"/node.txt |cut -c 48-51 | nl >> "$folder"/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
+  else
+    grep $id "$folder"/node.txt |cut -c 49-52 | nl >> "$folder"/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
+  fi
 done
 
 # We gathered all the informations on the node process, they can be killed
@@ -102,20 +70,4 @@ pkill node
 # Cleans the directory
 rm "$folder"/id.txt
 rm "$folder"/node.txt
-
-# Plots the graph
-if $remote_server 
-then
-  # Sends the results folder to the client 
-  if scp -r -q $folder hopla@$local_ip:project/experiment/results
-  then 
-    echo "Data sent to localhost"
-  else
-    echo "Problem with sending the data"
-  fi
-else
-  /bin/bash plot.sh & 
-fi
-
-
 

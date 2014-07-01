@@ -9,6 +9,7 @@ var options = {
 var clients = [];
 var numberClientsEachSecond = args[0];
 var timeExperiment = args[1];
+var timeCreatingClient = 100;
 
 
 function spawnClientsEachSecond(numberClientsEachSecond) {
@@ -40,9 +41,15 @@ var timer = setInterval(function(){
 setTimeout(function(){clearInterval(timer)},timeExperiment*1000);
 
 // Each seconds, every clients sends a ping to the servers.
+// setInterval(function () {
+//   clients.map(function(client){
+//     client.emit("ping", "ping" + Math.floor(Math.random() * 100));
+//   });
+// }, 1000);
+
 setInterval(function () {
   clients.map(function(client){
-    client.emit("ping", "ping" + Math.floor(Math.random() * 100));
+    client.emit("ping", "ping");
   });
 }, 1000);
 

@@ -25,18 +25,22 @@ To run the the experiment
 
 ```
 cd experiment
-./experiment.sh <nb_client_sec> <time_experiment>
+./run_experiment.sh <nb_client_sec> <time_experiment>
 ```
 
-The experiment can be run on a server without graphical output.
-In this case, the user is asked his IP and user name to transfer the data on his computer and then plot the results from there.
+The experiment can be run on a remote server without graphical output.
+In this case, the user needs to have gnuplot installed on his local machine. 
+He also will be prompted for the remote IP and login for ssh purposes.
+
+WARNING: the git project must absolutly be named experiment and placed in the root folder of the remote server
 
 ```
-./experiment.sh <nb_client_sec> <time_experiment>
+./run_experiment.sh <nb_client_sec> <time_experiment>
 ./plot.sh
 ```
 
 `nb_client_sec` Number of clients beeing spawnd every seconds
+
 `time_experiment` Time of the experiment
 
 
