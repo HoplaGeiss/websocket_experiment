@@ -34,11 +34,6 @@ He also will be prompted for the remote IP and login for ssh purposes.
 
 WARNING: the git project must absolutly be named experiment and placed in the root folder of the remote server
 
-```
-./run_experiment.sh <nb_client_sec> <time_experiment>
-./plot.sh
-```
-
 `nb_client_sec` Number of clients beeing spawnd every seconds
 
 `time_experiment` Time of the experiment

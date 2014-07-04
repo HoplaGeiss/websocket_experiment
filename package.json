@@ -14,8 +14,8 @@
     "url": "git://github.com/HoplaGeiss/WebSocket"
   },
   "dependencies": {
-    "socketcluster-client": "~0.9.17",
-    "socketcluster": "~0.9.22"
+    "socketcluster": "^0.9.27",
+    "socketcluster-client": "^0.9.19"
   },
   "readmeFilename": "README.md"
 }
