@@ -1,17 +1,23 @@
 #!/bin/bash
 dir=$(pwd)
+date=$(date +%Y-%m-%d)
+time=$(date | awk '{print $5}')
+folder="experiment_$date"_"$time"
+
+echo ""
+echo ""
 
 # Verifies the scripts as the correct number of parameters
 if [ $# -ne 3 ]
 then 
-  echo "Verify usage: experiment.sh <num_client_sec> <time_experiment> <num_client_processor>"
+  echo "Verify usage: run_experiment.sh <num_client_sec> <time_experiment> <num_client_processor>"
   exit 1
 fi
 
 # Asks if the local runs the code in local or on a remote server
 while true 
 do
-  read -p "Do you want to run your experiment on a remote host? [Y/N] " yn
+  read -p "Do you want to run your experiment on a remote host? [yn] " yn
   case $yn in
     [Yy]* ) 
       remote_server=true
@@ -27,56 +33,141 @@ done
 # if the job is executed on a distant server   
 if $remote_server 
 then
-  while true; do
-    # Asks for ssh infos
-    read -p "Please type in your ip: " remote_ip 
-    read -p "Please type your login: " remote_login
-    # Checks if ssh is possible
-    if ssh -o connectTimeout=5 $remote_login@$remote_ip 'exit' 
-    then 
 
-      # Executes the calculation
-      if ssh $remote_login@$remote_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 1
-      then
-        echo "Calculation finished on the remote server"
-      else
-        echo "ERROR: unable to do the calculation on the remote server"
-        exit 
-      fi
-      
-      # Sends the data back on the local machines
-      if scp -r -q $remote_login@$remote_ip:experiment/results/* $dir/results/
-      then
-        echo "Data sent to the local machine"
-      else
-        echo "ERROR: unable to sent data back to local server"
-        exit
-      fi
-
-      # Erases data from server
-      ssh $remote_login@$remote_ip 'rm -r experiment/results/*'
-
-      break
-    else 
-      echo "ERROR: this IP can not be reached" 
-    fi
+  # Try to use the configuration file, if one has been provided 
+  while true 
+  do
+    read -p "Did you make a configuration file? [y/n] " yesno
+    case $yesno in
+      [Yy]* ) 
+        confFile=true
+        break;;
+      [Nn]* ) 
+        confFile=false
+        break;;
+      * ) 
+        echo "Please answer yes or no.";;
+    esac
   done
+ 
+  echo ""
+  echo ""
+
+  # If the configuration file is set up
+  if $confile 
+  then
+    remote_server_ip=$(sed -n "2p" confFile.txt)
+    remote_server_login=$(sed -n "4p" confFile.txt)
+    remote_client_ip=$(sed -n "6p" confFile.txt)
+    remote_client_login=$(sed -n "8p" confFile.txt)
+
+    #Checks the informations
+    if ssh -o connectTimeout=5 $remote_server_login@$remote_server_ip 'exit' 
+    then 
+      echo "ssh connection successful to the server"
+    else 
+      echo "ERROR: server can not be reached" 
+      exit 1
+    fi
+    if ssh -o connectTimeout=5 $remote_client_login@$remote_client_ip 'exit' 
+    then 
+      echo "ssh connection successful to the CLIENT"
+    else 
+      echo "ERROR: client can not be reached" 
+      exit 1
+    fi
+  # If the configuration file is not set up
+  elif ! $confFile
+  then
+    # SERVER infos
+    while true; do
+      # Asks for ssh infos
+      echo ""
+      echo "## SERVER script ##"
+      read -p "Please type in your ip: " remote_server_ip 
+      read -p "Please type your login: " remote_server_login
+      # Checks if ssh is possible
+      if ssh -o connectTimeout=5 $remote_server_login@$remote_server_ip 'exit' 
+      then 
+        echo "ssh connection successful to the SERVER"
+        break
+      else 
+        echo "ERROR: this IP can not be reached" 
+      fi
+    done
+    
+    # CLIENT infos
+    while true; do
+      # Asks for ssh infos
+      echo ""
+      echo "## CLIENT script ##"
+      read -p "Please type in your ip: " remote_client_ip 
+      read -p "Please type your login: " remote_client_login
+      # Checks if ssh is possible
+      if ssh -o connectTimeout=5 $remote_client_login@$remote_client_ip 'exit' 
+      then 
+        echo "ssh connection successful to the client"
+        echo ""
+        echo ""
+        break
+      else 
+        echo "ERROR: this IP can not be reached" 
+      fi
+    done
+  fi
+fi
+
+echo ""
+echo ""
+
+if $remote_server 
+then
+  # Executes the calculation
+  ssh $remote_server_login@$remote_server_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 $folder 1 0 & 
+  ssh $remote_client_login@$remote_client_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 $folder 1 1 $remote_server_ip 
+ 
+  echo "Data has been generated"
+
+  # Sends the data back on the local machines
+  scp -r -q $remote_client_login@$remote_client_ip:experiment/results/* $dir/results/ 
+  sleep 3
+  scp -r -q $remote_server_login@$remote_server_ip:experiment/results/$folder/server/* $dir/results/$folder/server/ 
+  
+  echo "data sent to the local machine"
+
+  # Erases data from server
+  ssh $remote_client_login@$remote_client_ip 'rm -r experiment/results/*'
+  ssh $remote_server_login@$remote_server_ip 'rm -r experiment/results/*'
+
 # If the job is local
 else
- /bin/bash ./calculation.sh $1 $2 $3 0  
+  if /bin/bash ./calculation.sh $1 $2 $3 $folder 0  
+  then
+    echo "Data has been generated"
+  else
+    echo "Error: Problem in calculation"
+    exit 1
+  fi
 fi
 
 # Once the calculation is done and all the data is gathered. Plot the graph
 if /bin/bash ./plot.sh
 then  
   echo "Graph plotted"
-  folder="$(ls -t results | head -1)/"
-  eog results/$folder &
 else
   echo "ERROR: unable to plot the graph"
+  exit 1
 fi
 
+sleep 3
 
+if find results/$folder -name '*.png' | xargs eog --slide-show 
+then
+  echo "Graph opened"
+else
+  echo "ERROR: unable to access graph"
+  exit 1
+fi
 
 
 

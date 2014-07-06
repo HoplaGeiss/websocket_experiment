@@ -2,36 +2,58 @@
 declare ids=''
 declare cmdLines=''
 declare fileNames=''
-
+folder="$4"
 # Creates a new folder for each experiments
 date=$(date +%Y-%m-%d)
 # If we are on the remote machine the print $4
-if [ "$4" -ge 1 ] 
+if [ "$5" -ge 1 ] 
 then
-  time=$(date | awk '{print $4}')
+  remote_server=true
+  if [ "$6" -ge 1 ]
+  then
+    remote_serverIsClient=true
+  else
+    remote_serverIsClient=false
+  fi
 else
-  time=$(date | awk '{print $5}')
+  remote_server=false
 fi
-folder="results/experiment_$date"_"$time"
-mkdir "$folder"
+
+mkdir "results/$folder"
+cd "results/$folder"
+mkdir server
+mkdir local_machine
+mkdir client
+cd ../..
+
+pkill node
 
 # Stores values in a file for later use
-echo $1 > $folder/conf.txt
-echo $2 >> $folder/conf.txt
+echo $1 > results/$folder/conf.txt
+echo $2 >> results/$folder/conf.txt
 
-top -b -d 1 > "$folder"/top.txt & # Starts top and saves raw data in top.txt
+top -b -d 1 > results/$folder/top.txt & # Starts top and saves raw data in top.txt
 
 # Starts the clients and the servers scripts
-node serverScript.js &
-node clientScript.js $1 $2 $3 &
+if $remote_server && ! $remote_serverIsClient 
+then
+  node serverScript &
+elif $remote_server && $remote_serverIsClient
+then 
+  node clientScript.js $1 $2 $3 $7 &
+elif ! $remote_server 
+then
+  node serverScript & 
+  node clientScript $1 $2 $3 localhost &
+fi
 
 # Stops the recording after the "time_experiment" is over
 sleep $2 
 pkill top
 
-grep node "$folder"/top.txt > "$folder"/node.txt # Saves raw data concerning node process in node.txt
-grep node "$folder"/top.txt | cut -c 1-5 > "$folder"/id.txt
-rm "$folder"/top.txt
+grep node results/$folder/top.txt > results/$folder/node.txt # Saves raw data concerning node process in node.txt
+grep node results/$folder/top.txt | cut -c 1-5 > results/$folder/id.txt
+rm results/$folder/top.txt
 
 # Saves the process ids in ids 
 while read line
@@ -40,7 +62,7 @@ do
   then
     ids="$ids $line"
   fi 
-done < "$folder"/id.txt 
+done < results/$folder/id.txt 
 
 
 # Creates a folder storing the data of each processus
@@ -52,15 +74,28 @@ do
   cmdLine="${almostGoodCmdLine%%.js*}" # Supresses confusing details at the end of the process name 
   cmdLines="$cmdLines $cmdLine" # Saves the process names in an array
   fileNames="$fileNames $cmdLine:$id" # Saves the fileNames in an array
-  
-  # Write measurements in files 
-  echo $cmdLine > "$folder"/"$cmdLine":"$id".txt # writes the name of the command line used, so as to use it as label in gnuplot
 
-  if [ $4 -ge 1 ] # If we are on a remote machine
+  # Write measurements in files 
+  if $remote_server && ! $remote_serverIsClient 
   then
-    grep $id "$folder"/node.txt |cut -c 48-51 | nl >> "$folder"/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
-  else
-    grep $id "$folder"/node.txt |cut -c 49-52 | nl >> "$folder"/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
+    echo $cmdLine > results/$folder/server/"$cmdLine":"$id".txt # writes the name of the command line used, so as to use it as label in gnuplot
+  elif $remote_server && $remote_serverIsClient
+  then
+    echo $cmdLine > results/$folder/client/"$cmdLine":"$id".txt # writes the name of the command line used, so as to use it as label in gnuplot
+  elif ! $remote_server 
+  then
+    echo $cmdLine > results/$folder/local_machine/"$cmdLine":"$id".txt # writes the name of the command line used, so as to use it as label in gnuplot
+  fi
+
+  if $remote_server && ! $remote_serverIsClient 
+  then
+    grep $id results/$folder/node.txt |cut -c 48-51 | nl >> results/$folder/server/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
+  elif $remote_server && $remote_serverIsClient
+  then
+    grep $id results/$folder/node.txt |cut -c 48-51 | nl >> results/$folder/client/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
+  elif ! $remote_server 
+  then
+    grep $id results/$folder/node.txt |cut -c 49-52 | nl >> results/$folder/local_machine/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
   fi
 done
 
@@ -68,6 +103,6 @@ done
 pkill node 
 
 # Cleans the directory
-rm "$folder"/id.txt
-rm "$folder"/node.txt
+rm results/$folder/id.txt
+rm results/$folder/node.txt
 

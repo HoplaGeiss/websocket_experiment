@@ -17,7 +17,7 @@ fail () {
 
 
 # Actual code
-sudo -v
+# sudo -v
 
 echo ''
 info 'Setting up the websocket experiment configuration'

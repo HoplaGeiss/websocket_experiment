@@ -1,0 +1,8 @@
+Remote server IP:
+54.76.140.181
+Remote server login:
+ubuntu
+Remote client IP:
+54.72.93.206
+Remote client login:
+ubuntu
