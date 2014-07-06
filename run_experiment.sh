@@ -2,9 +2,9 @@
 dir=$(pwd)
 
 # Verifies the scripts as the correct number of parameters
-if [ $# -ne 2 ]
+if [ $# -ne 3 ]
 then 
-  echo "Verify usage: experiment.sh <nb_client_sec> <time_experiment>"
+  echo "Verify usage: experiment.sh <num_client_sec> <time_experiment> <num_client_processor>"
   exit 1
 fi
 
@@ -36,7 +36,7 @@ then
     then 
 
       # Executes the calculation
-      if ssh $remote_login@$remote_ip 'cd experiment; ./calculation.sh ' $1 $2 1
+      if ssh $remote_login@$remote_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 1
       then
         echo "Calculation finished on the remote server"
       else
@@ -63,7 +63,7 @@ then
   done
 # If the job is local
 else
- /bin/bash ./calculation.sh $1 $2 0  
+ /bin/bash ./calculation.sh $1 $2 $3 0  
 fi
 
 # Once the calculation is done and all the data is gathered. Plot the graph

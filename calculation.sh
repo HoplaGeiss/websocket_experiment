@@ -6,7 +6,7 @@ declare fileNames=''
 # Creates a new folder for each experiments
 date=$(date +%Y-%m-%d)
 # If we are on the remote machine the print $4
-if [ "$3" -ge 1 ] 
+if [ "$4" -ge 1 ] 
 then
   time=$(date | awk '{print $4}')
 else
@@ -23,7 +23,7 @@ top -b -d 1 > "$folder"/top.txt & # Starts top and saves raw data in top.txt
 
 # Starts the clients and the servers scripts
 node serverScript.js &
-node clientScript.js $1 $2 &
+node clientScript.js $1 $2 $3 &
 
 # Stops the recording after the "time_experiment" is over
 sleep $2 
@@ -56,7 +56,7 @@ do
   # Write measurements in files 
   echo $cmdLine > "$folder"/"$cmdLine":"$id".txt # writes the name of the command line used, so as to use it as label in gnuplot
 
-  if [ $3 -ge 1 ] # If we are on a remote machine
+  if [ $4 -ge 1 ] # If we are on a remote machine
   then
     grep $id "$folder"/node.txt |cut -c 48-51 | nl >> "$folder"/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
   else
