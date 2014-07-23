@@ -1,9 +1,20 @@
 var SocketCluster = require('socketcluster').SocketCluster;
+var args = process.argv.slice(2);
+
+var numWorker = args[0];
+var numBalancer = args[1];
+var workerList = [];
+var portInitial = 8000;
+
+for( var i = 0; i < numWorker; i++){
+  workerList.push(portInitial);
+  portInitial += 100;
+}
 
 var socketCluster = new SocketCluster({
-    workers: [9100],
+    workers: workerList,
     stores: [9001],
-    balancerCount: 2,
+    balancerCount: numBalancer,
     logLevel: 2,
     port: 8080,
     appName: 'myapp',

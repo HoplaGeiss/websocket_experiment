@@ -37,7 +37,7 @@ module.exports.run = function (worker) {
     // Handles incoming WebSocket connections and listens for events
     wsServer.on("connection", function (socket) {
         
-      // console.log("Socket " + socket.session.id + " is connected.");  // Prints the id of the newly connected clients.  
+     // console.log("Socket " + socket.session.id + " is connected.");  // Prints the id of the newly connected clients.  
 
      activeSessions[socket.session.id] = socket.session; // Stores the id of the sockets
 

@@ -9,7 +9,7 @@ date=$(date +%Y-%m-%d)
 if [ "$5" -ge 1 ] 
 then
   remote_server=true
-  if [ "$6" -ge 1 ]
+  if [ "$8" -ge 1 ]
   then
     remote_serverIsClient=true
   else
@@ -37,13 +37,13 @@ top -b -d 1 > results/$folder/top.txt & # Starts top and saves raw data in top.t
 # Starts the clients and the servers scripts
 if $remote_server && ! $remote_serverIsClient 
 then
-  node serverScript &
+  node serverScript $6 $7 &
 elif $remote_server && $remote_serverIsClient
 then 
-  node clientScript.js $1 $2 $3 $7 &
-elif ! $remote_server 
+  node clientScript $1 $2 $3 $9 &
+elif ! $remote_server  
 then
-  node serverScript & 
+  node serverScript $6 $7 & 
   node clientScript $1 $2 $3 localhost &
 fi
 
@@ -53,7 +53,7 @@ pkill top
 
 grep node results/$folder/top.txt > results/$folder/node.txt # Saves raw data concerning node process in node.txt
 grep node results/$folder/top.txt | cut -c 1-5 > results/$folder/id.txt
-rm results/$folder/top.txt
+# rm results/$folder/top.txt
 
 # Saves the process ids in ids 
 while read line

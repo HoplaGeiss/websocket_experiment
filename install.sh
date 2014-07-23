@@ -46,4 +46,16 @@ else
   fail 'Please install nodejs'
 fi
 echo ''
+echo 'Dependencies installed'
+
+echo ''
+info 'Configuring OS limits'
+info '---------------------'
+sudo bash -c "echo ubuntu soft nofile 100000 >> /etc/security/limits.conf"
+sudo bash -c "echo ubuntu hard nofile 100000 >> /etc/security/limits.conf"
+echo ''
+echo 'line appended to /etc/security/limits.conf'
+
+echo ''
+echo ''
 success 'Setup complete. Enjoy!!'

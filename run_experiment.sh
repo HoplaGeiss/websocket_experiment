@@ -14,6 +14,10 @@ then
   exit 1
 fi
 
+# Gets the parameters for the serverScript from configuration file
+numWorker=$(sed -n "11p" confFile.txt)
+numLoadBalancer=$(sed -n "13p" confFile.txt)
+
 # Asks if the local runs the code in local or on a remote server
 while true 
 do
@@ -122,26 +126,26 @@ echo ""
 
 if $remote_server 
 then
+
+  # Creates folders on the local machine
+  mkdir results/$folder
+  mkdir results/$folder/server
+  mkdir results/$folder/client
+
   # Executes the calculation
-  ssh $remote_server_login@$remote_server_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 $folder 1 0 & 
-  ssh $remote_client_login@$remote_client_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 $folder 1 1 $remote_server_ip 
- 
+  ssh $remote_server_login@$remote_server_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 $folder 1 $numWorker $numLoadBalancer 0 & 
+  ssh $remote_client_login@$remote_client_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 $folder 1 $numWorker $numLoadBalancer 1 $remote_server_ip 
   echo "Data has been generated"
 
   # Sends the data back on the local machines
-  scp -r -q $remote_client_login@$remote_client_ip:experiment/results/* $dir/results/ 
-  sleep 3
+  scp -r -q $remote_client_login@$remote_client_ip:experiment/results/$folder/* $dir/results/$folder/ &
   scp -r -q $remote_server_login@$remote_server_ip:experiment/results/$folder/server/* $dir/results/$folder/server/ 
-  
+  sleep 5
   echo "data sent to the local machine"
-
-  # Erases data from server
-  ssh $remote_client_login@$remote_client_ip 'rm -r experiment/results/*'
-  ssh $remote_server_login@$remote_server_ip 'rm -r experiment/results/*'
 
 # If the job is local
 else
-  if /bin/bash ./calculation.sh $1 $2 $3 $folder 0  
+  if /bin/bash ./calculation.sh $1 $2 $3 $folder 0 $numWorker $numLoadBalancer  
   then
     echo "Data has been generated"
   else

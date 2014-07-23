@@ -29,12 +29,10 @@ function spawnClientsEachSecond(numberClientsEachSecond) {
     // Adds the new websocket client to an array.
     clients.push(socketCluster.connect(options));
     
-
     // Optionnal, just prints a message when a new websocket client is created.
     // clients[clients.length -1].on("connect", function () {
     // console.log("\nCONNECTED #" + this.id);
     // });
-
 
   }
 }
