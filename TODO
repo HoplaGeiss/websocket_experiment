@@ -1,0 +1,37 @@
+- check output from browser
+- see the performance diff with Jon client
+
+- experiment on ws to compare single threaded code vs SocketCluster
+
+// ----------
+// EXPERIMENT
+// ----------
+
+CLIENT
+
+- See how many connections can create a single client
+- Check if this number stays the same with more clients
+
+SERVER
+
+- fibonacci serie / fibonacci number 
+  + CPU usage way to high
+- long string
+  + no noticable influence
+    
+- send file
+- code single server with ws ?
+
+
+- See what has the most influence: ping/sec, nb communication, size file
+- Max concurrent connection
+
+
+node_modules/socket.io-stream/lib/socket.js
+REMOVE: 
+
+if (stream.socket || stream.destroyed) {
+      throw new Error('stream has already been sent.');
+}
+
+

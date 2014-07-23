@@ -75,7 +75,7 @@ then
     fi
     if ssh -o connectTimeout=5 $remote_client_login@$remote_client_ip 'exit' 
     then 
-      echo "ssh connection successful to the CLIENT"
+      echo "ssh connection successful to the client"
     else 
       echo "ERROR: client can not be reached" 
       exit 1
@@ -135,6 +135,7 @@ then
   # Executes the calculation
   ssh $remote_server_login@$remote_server_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 $folder 1 $numWorker $numLoadBalancer 0 & 
   ssh $remote_client_login@$remote_client_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 $folder 1 $numWorker $numLoadBalancer 1 $remote_server_ip 
+  echo ""
   echo "Data has been generated"
 
   # Sends the data back on the local machines
@@ -147,6 +148,7 @@ then
 else
   if /bin/bash ./calculation.sh $1 $2 $3 $folder 0 $numWorker $numLoadBalancer  
   then
+    echo ""
     echo "Data has been generated"
   else
     echo "Error: Problem in calculation"
@@ -165,13 +167,7 @@ fi
 
 sleep 3
 
-if find results/$folder -name '*.png' | xargs eog --slide-show 
-then
-  echo "Graph opened"
-else
-  echo "ERROR: unable to access graph"
-  exit 1
-fi
+find results/$folder -name '*.png' | xargs eog & 
 
 
 

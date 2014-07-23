@@ -2,6 +2,7 @@
 declare ids=''
 declare cmdLines=''
 declare fileNames=''
+let communication=$1*$3
 folder="$4"
 # Creates a new folder for each experiments
 date=$(date +%Y-%m-%d)
@@ -40,11 +41,11 @@ then
   node serverScript $6 $7 &
 elif $remote_server && $remote_serverIsClient
 then 
-  node clientScript $1 $2 $3 $9 &
+  node clientJon $1 $2 $3 $9 &
 elif ! $remote_server  
 then
   node serverScript $6 $7 & 
-  node clientScript $1 $2 $3 localhost &
+  node clientJon $1 $2 $3 localhost &
 fi
 
 # Stops the recording after the "time_experiment" is over
@@ -64,38 +65,51 @@ do
   fi 
 done < results/$folder/id.txt 
 
+# Remove unwanted ids
+if $remote_server && ! $remote_serverIsClient 
+then
+  ids=$(echo $ids | cut -d " " -f3-)
+elif $remote_server && $remote_serverIsClient
+then
+  ids=$(echo $ids | cut -d " " -f2-)
+elif ! $remote_server 
+then
+  ids=$(echo $ids | cut -d " " -f4-)
+fi
 
 # Creates a folder storing the data of each processus
 for id in $ids
 do
   # saves the command line used for each node_process
   rawCmdLine=$(cat /proc/$id/cmdline) # Looks into /proc to find the name of the command line
-  almostGoodCmdLine="${rawCmdLine##*/}" # supresses confusing path at the begenning of the process name 
-  cmdLine="${almostGoodCmdLine%%.js*}" # Supresses confusing details at the end of the process name 
+  cmdLine="${rawCmdLine##*/}" # supresses confusing path at the begenning of the process name 
+  cmdLine="${cmdLine%%.js*}" # Supresses confusing details at the end of the process name 
+  cmdLine="${cmdLine%%[0-9]*}" # Supresses confusing details at the end of the process name 
   cmdLines="$cmdLines $cmdLine" # Saves the process names in an array
   fileNames="$fileNames $cmdLine:$id" # Saves the fileNames in an array
 
   # Write measurements in files 
   if $remote_server && ! $remote_serverIsClient 
   then
-    echo $cmdLine > results/$folder/server/"$cmdLine":"$id".txt # writes the name of the command line used, so as to use it as label in gnuplot
+    echo $cmdLine > results/$folder/server/"$cmdLine":"$id".txt 
   elif $remote_server && $remote_serverIsClient
   then
-    echo $cmdLine > results/$folder/client/"$cmdLine":"$id".txt # writes the name of the command line used, so as to use it as label in gnuplot
+    echo $cmdLine > results/$folder/client/"$cmdLine":"$id".txt 
   elif ! $remote_server 
   then
-    echo $cmdLine > results/$folder/local_machine/"$cmdLine":"$id".txt # writes the name of the command line used, so as to use it as label in gnuplot
+    echo $cmdLine > results/$folder/local_machine/"$cmdLine":"$id".txt 
   fi
 
   if $remote_server && ! $remote_serverIsClient 
   then
-    grep $id results/$folder/node.txt |cut -c 48-51 | nl >> results/$folder/server/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
+    grep $id results/$folder/node.txt |cut -c 48-51 | nl | awk -v communication="$communication" '{printf "%d %d \n", communication*$1 , $2}' >> results/$folder/server/"$cmdLine":"$id".txt 
+    # grep $id results/$folder/node.txt |cut -c 48-51 | nl >> results/$folder/server/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
   elif $remote_server && $remote_serverIsClient
   then
-    grep $id results/$folder/node.txt |cut -c 48-51 | nl >> results/$folder/client/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
+    grep $id results/$folder/node.txt |cut -c 48-51 | nl | awk -v communication="$communication" '{printf "%d %d \n", communication*$1 , $2}' >> results/$folder/client/"$cmdLine":"$id".txt 
   elif ! $remote_server 
   then
-    grep $id results/$folder/node.txt |cut -c 49-52 | nl >> results/$folder/local_machine/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
+    grep $id results/$folder/node.txt |cut -c 49-52 | nl | awk -v communication="$communication" '{printf "%d %d \n", communication*$1 , $2}' >> results/$folder/local_machine/"$cmdLine":"$id".txt # greps all the lines in node.txt corresponding to the current id and prints it in a file 
   fi
 done
 
@@ -104,5 +118,5 @@ pkill node
 
 # Cleans the directory
 rm results/$folder/id.txt
-rm results/$folder/node.txt
+# rm results/$folder/node.txt
 

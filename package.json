@@ -1,8 +1,8 @@
 {
-  "name": "WebSocket",
+  "name": "websocket_experiment",
   "description": "WebSocket - Master thesis experiments",
   "version": "1.0.0",
-  "homepage": "https://github.com/HoplaGeiss/WebSocket",
+  "homepage": "https://github.com/HoplaGeiss/websocket_experiment",
   "contributors": [
     {
       "name": "Gabriel Muller",
@@ -11,11 +11,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/HoplaGeiss/WebSocket"
+    "url": "git://github.com/HoplaGeiss/websocket_experiment"
   },
   "dependencies": {
-    "socketcluster": "^0.9.27",
-    "socketcluster-client": "^0.9.19"
+    "delivery": "0.0.3",
+    "socket.io-stream": "0.5.3",
+    "socketcluster": "0.9.35",
+    "socketcluster-client": "0.9.21"
   },
   "readmeFilename": "README.md"
 }
