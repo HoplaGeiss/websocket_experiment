@@ -1,0 +1,22 @@
+/* -------
+/* Goal */
+/* -------
+
+Discuss about the performance of SocketCluster when adding more loadbalancer and worker
+
+
+/* -------------
+/* Parameters */
+/* -------------
+
+
+instance type: amazon m3.medium
+Average ping interval: 2.5s
+type of ping: random number [50]
+Frequence new client: 1s
+Number of new client: 20 
+Time experimet: 60s
+Number of client: 2
+
+
+

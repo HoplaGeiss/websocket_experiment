@@ -1,0 +1,19 @@
+      <script type="text/javascript">
+        var options = {
+            protocol: 'http',
+            hostname: "localhost",
+            port: "8080",
+            autoReconnect: true 
+        };
+        var socket = socketCluster.connect(options);
+        socket.on('connect', function () {
+          console.log('CONNECTED');
+        }); 
+        socket.on('pong', function(data){
+            console.log(data);
+          var curHTML = document.body.innerHTML;
+          curHTML += 'Number of pings: ' + data + '<br />';
+          document.body.innerHTML = curHTML;
+        });
+        socket.emit('ping');
+      </script>

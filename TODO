@@ -1,7 +1,9 @@
 - check output from browser
-- see the performance diff with Jon client
+- latex subfigures
+- latex figure list
+- write experiment section
+- unable the margins for digital version
 
-- experiment on ws to compare single threaded code vs SocketCluster
 
 // ----------
 // EXPERIMENT
@@ -35,3 +37,47 @@ if (stream.socket || stream.destroyed) {
 }
 
 
+
+
+// ----------------
+// Browser debugger
+// ----------------
+
+var clientSC = require("socketcluster-client");
+var options = {
+  protocol: 'http',
+  hostname: localhost,
+  port: "8080",
+  autoReconnect: true 
+};
+var socket = clientSC.connect(options);
+socket.emit('ping', {param: 'pong'});
+
+// ----------------
+// latex subfigures
+// ----------------
+
+\begin{figure}[htbp]
+        \centering
+        \begin{subfigure}[b]{0.3\textwidth}
+                \includegraphics[width=0.4\textwidth]{./Figures/1_client.png}
+                \caption{A gull}
+                \label{fig:gull}
+        \end{subfigure}%
+      
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[b]{0.3\textwidth}
+                \includegraphics[width=0.4\textwidth]{./Figures/2_client.png}
+                \caption{A mouse}
+                \label{fig:mouse}
+        \end{subfigure}
+        \caption{Pictures of animals}\label{fig:animals}
+\end{figure}
+
+
+
+
+:r ! ls   => list all the files of the current directory
+gq
+gf

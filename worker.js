@@ -1,5 +1,4 @@
 var fs = require("fs");
-var ss = require('socket.io-stream');
 var dl  = require('delivery');
 
 console.log("WORKER:", process.pid);
@@ -60,7 +59,6 @@ module.exports.run = function (worker) {
 
     var activeSessions = {};
     var count = 0;
-    var stream = ss.createStream();
 
     // Handles incoming WebSocket connections and listens for events
     wsServer.on("connection", function (socket) {
@@ -70,7 +68,6 @@ module.exports.run = function (worker) {
      activeSessions[socket.session.id] = socket.session; // Stores the id of the sockets
       
       // The server listens to the ping event from the clients
-      socket.setMaxListeners(0);
       socket.on("ping", function (N) {
         
         // SENDS SIMPLE PONG EVENT
@@ -79,19 +76,21 @@ module.exports.run = function (worker) {
         // console.log("Socket " + this.session.id + " reveived a ping: " + data);
 
         // SENDS FILE
+
         var delivery = dl.listen(socket);
         delivery.connect();
         delivery.on('delivery.connect',function(delivery){
 
           delivery.send({
-            name: 'foo.txt',
-            path : './foo.txt'
+            name: 'small_file',
+            path : './small_file'
           });
 
           delivery.on('send.success',function(file){
             // console.log('File successfully sent to client!');
           });
         });
+
       });
     });
 

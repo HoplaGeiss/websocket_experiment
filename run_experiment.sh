@@ -8,9 +8,9 @@ echo ""
 echo ""
 
 # Verifies the scripts as the correct number of parameters
-if [ $# -ne 3 ]
+if [ $# -ne 4 ]
 then 
-  echo "Verify usage: run_experiment.sh <num_client_sec> <time_experiment> <num_client_processor>"
+  echo "Verify usage: run_experiment.sh <num_client_sec> <time_experiment> <num_client_processor> <socketCluster>"
   exit 1
 fi
 
@@ -123,7 +123,6 @@ fi
 
 echo ""
 echo ""
-
 if $remote_server 
 then
 
@@ -133,8 +132,8 @@ then
   mkdir results/$folder/client
 
   # Executes the calculation
-  ssh $remote_server_login@$remote_server_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 $folder 1 $numWorker $numLoadBalancer 0 & 
-  ssh $remote_client_login@$remote_client_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 $folder 1 $numWorker $numLoadBalancer 1 $remote_server_ip 
+  ssh $remote_server_login@$remote_server_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 $4 $folder 1 $numWorker $numLoadBalancer 0 & 
+  ssh $remote_client_login@$remote_client_ip 'cd experiment; ./calculation.sh ' $1 $2 $3 $4 $folder 1 $numWorker $numLoadBalancer 1 $remote_server_ip 
   echo ""
   echo "Data has been generated"
 
@@ -146,7 +145,7 @@ then
 
 # If the job is local
 else
-  if /bin/bash ./calculation.sh $1 $2 $3 $folder 0 $numWorker $numLoadBalancer  
+  if /bin/bash ./calculation.sh $1 $2 $3 $4 $folder 0 $numWorker $numLoadBalancer  
   then
     echo ""
     echo "Data has been generated"

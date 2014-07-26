@@ -1,0 +1,17 @@
+/* -------
+/* Goal */
+/* -------
+
+See if n clients produce n time more connections then 1 client
+
+/* -------------
+/* Parameters */
+/* -------------
+
+instance type: amazon m3.2xlarge
+Average ping interval: 2.5s
+type of ping: random number [50]
+Frequence new client: 1s
+Number of new client: 15
+Time experimet: 120s
+

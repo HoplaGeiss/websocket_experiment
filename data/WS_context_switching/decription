@@ -1,0 +1,21 @@
+/* -------
+/* Goal */
+/* -------
+
+Expose the context switching problem
+
+/* -------------
+/* Parameters */
+/* -------------
+
+
+instance type: amazon m3.medium
+Average ping interval: 2.5s
+type of ping: random number [50]
+Frequence new client: 1s
+Number of new client: 40
+Time experimet: 80s
+Number of client: 1
+
+
+

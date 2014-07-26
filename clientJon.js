@@ -1,7 +1,6 @@
 var args = process.argv.slice(2);
 var cluster = require('cluster');
 var clientSC = require("socketcluster-client");
-var ss = require('socket.io-stream');
 var dl  = require('delivery');
 var numberClientsEachSecond = args[0];
 var timeExperiment = args[1];
@@ -35,31 +34,33 @@ if (cluster.isMaster) {
 		errorDomain.add(socket);
 
 
+
 		// SENDS PINGS
-		var intv = Math.round(Math.random() * 5000);
+		var intv = Math.round(Math.random() * 12000);
 		setInterval(function () {
 			// socket.emit('ping', {param: 'pong'});
 			socket.emit('ping', Math.floor(Math.random() * 50));
+			// console.log('CLIENT: ping sent')
 		}, intv);
 
-    //RECEPTION OF ANSWER FROM CLIENT
-    clients.map(function(client){
+    // RECEPTION OF CLIENTS' ANSWERS
 
-      // RECEPTION OF FILES
-      var delivery = dl.listen(socket);
-      delivery.on('receive.success',function(file){
-
-        fs.writeFile(file.name, file.buffer, function(err){
-          if(err){
-            // console.log('File could not be saved: ' + err);
-          }else{
-            console.log('File ' + file.name + " saved");
-          };
-        });
-      });
-
-      // console.log('Incoming: ' + N);
-    });
+    // clients.map(function(client){
+    //   // RECEPTION OF FILES
+    //   var delivery = dl.listen(socket);
+    //   delivery.on('receive.success',function(file){
+    //
+    //     fs.writeFile(file.name, file.buffer, function(err){
+    //       if(err){
+    //         // console.log('File could not be saved: ' + err);
+    //       }else{
+    //         // console.log('File ' + file.name + " saved");
+    //       };
+    //     });
+    //   });
+    //
+    //   // console.log('Incoming: ' + N);
+    // });
     
     // CREATION OF NEW CLIENTS
     setTimeout(connectSC, 1000/numberClientsEachSecond);
