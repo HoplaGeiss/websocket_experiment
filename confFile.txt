@@ -1,13 +1,13 @@
 Remote server IP:
-54.77.107.173
+54.77.92.55
 Remote server login:
 ubuntu
 Remote client IP:
-54.77.0.141
+54.72.201.152
 Remote client login:
 ubuntu
 ##serverScript##
 number of worker:
-2
+18
 number of load balancer:
-2
+12
